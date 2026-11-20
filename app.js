@@ -1,5 +1,5 @@
 /**
- * AttendTrack - Student Attendance & Academic Support System
+ * EduAlert - Student Attendance & Academic Support System
  * Pure Vanilla JavaScript (Basic, beginner-friendly code)
  */
 
@@ -418,7 +418,7 @@ function exportReportToCSV() {
   const downloadUrl = URL.createObjectURL(blob);
   const link = document.createElement("a");
   link.setAttribute("href", downloadUrl);
-  link.setAttribute("download", "attendtrack_report.csv");
+  link.setAttribute("download", "edualert_report.csv");
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

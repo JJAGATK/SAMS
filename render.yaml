@@ -1,7 +1,7 @@
 services:
   # Web Service (Node.js) on Render
   - type: web
-    name: attendtrack
+    name: edualert
     runtime: node
     plan: free
     buildCommand: ""

@@ -1,13 +1,13 @@
 {
-  "name": "attendtrack",
+  "name": "edualert",
   "version": "1.0.0",
-  "description": "AttendTrack - Student Attendance & Academic Support System. A clean, minimal web application to track student attendance and highlight students needing early academic support.",
+  "description": "EduAlert - Student Attendance & Academic Support System. A clean, minimal web application to track student attendance and highlight students needing early academic support.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "keywords": [
-    "attendtrack",
+    "edualert",
     "attendance",
     "academic-support",
     "vanilla-js",

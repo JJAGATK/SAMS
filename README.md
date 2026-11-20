@@ -1,4 +1,4 @@
-# AttendTrack — Student Attendance & Academic Support System
+# EduAlert — Student Attendance & Academic Support System
 
 A clean, modern, and minimal web application designed to track student attendance and identify students who need academic support before they miss too many classes.
 
@@ -19,7 +19,7 @@ Develop a web application that analyzes attendance records and highlights studen
 - **Student History:** View past class logs and attendance breakdown for each student.
 - **Academic Support Alerts:** Dedicated alert section highlighting students who have fallen below the 75% attendance threshold.
 - **Dashboard Overview:** Clean summary cards displaying Total Students, Average Attendance %, and count of students needing support.
-- **Report Export:** Download a complete attendance summary spreadsheet (`attendtrack_report.csv`) with one click.
+- **Report Export:** Download a complete attendance summary spreadsheet (`edualert_report.csv`) with one click.
 
 ---
 
@@ -47,9 +47,9 @@ Develop a web application that analyzes attendance records and highlights studen
 ## Deploying to Render (Free)
 
 1. Go to [Render Dashboard](https://dashboard.render.com/) and click **New +** > **Web Service**.
-2. Connect your GitHub repository: `JJAGATK/student-attendance-risk-predictor`.
+2. Connect your GitHub repository: `JJAGATK/student-attendance-system`.
 3. Set the following:
-   - **Name:** `attendtrack`
+   - **Name:** `edualert`
    - **Runtime:** `Node`
    - **Start Command:** `node server.js`
    - **Plan:** `Free`
