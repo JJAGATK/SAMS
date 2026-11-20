@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Attendance Risk Predictor</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Top Navigation / Header -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="brand">
+        <h2>Student Attendance Risk Predictor</h2>
+      </div>
+      <!-- Login / Role Selector -->
+      <div class="auth-box">
+        <label for="userRole">Login as:</label>
+        <select id="userRole" class="input-sm">
+          <option value="admin">Admin Login</option>
+          <option value="student">Student Login</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+
+    <!-- Project Description -->
+    <section class="description-card">
+      <p><strong>Problem:</strong> Colleges often identify students with poor attendance only after they have missed many classes, making timely intervention difficult.</p>
+      <p><strong>Objective:</strong> Develop a web application that analyzes attendance records and highlights students who may need academic support.</p>
+    </section>
+
+    <!-- Student View (Visible only when Student Login is active) -->
+    <section id="studentViewSection" class="card student-view" style="display: none;">
+      <div class="student-select-row">
+        <label for="selectStudentAccount">Select Student:</label>
+        <select id="selectStudentAccount" class="input">
+          <!-- Populated by JavaScript -->
+        </select>
+      </div>
+      <div id="studentPersonalCard" class="student-profile-box">
+        <!-- Filled dynamically -->
+      </div>
+    </section>
+
+    <!-- Admin Section: Dashboard (Summary Statistics) -->
+    <section id="dashboardSection" class="dashboard-grid">
+      <div class="stat-card">
+        <h3>Total Students</h3>
+        <p class="stat-number" id="dashTotalStudents">0</p>
+      </div>
+      <div class="stat-card">
+        <h3>Average Attendance</h3>
+        <p class="stat-number" id="dashAvgAttendance">0%</p>
+      </div>
+      <div class="stat-card stat-alert">
+        <h3>Students Needing Support</h3>
+        <p class="stat-number" id="dashAtRisk">0</p>
+      </div>
+    </section>
+
+    <!-- Admin Section: Attendance Entry & Import -->
+    <section id="entrySection" class="card">
+      <div class="card-header">
+        <h3>Attendance Entry & Import</h3>
+        <button type="button" id="btnImportData" class="btn btn-secondary">Import Sample Records</button>
+      </div>
+      <form id="attendanceForm" class="form-grid">
+        <div class="form-group">
+          <label for="inputRoll">Roll No / ID</label>
+          <input type="text" id="inputRoll" required placeholder="e.g. CS-101">
+        </div>
+        <div class="form-group">
+          <label for="inputName">Student Name</label>
+          <input type="text" id="inputName" required placeholder="e.g. Rahul Sharma">
+        </div>
+        <div class="form-group">
+          <label for="inputCourse">Course</label>
+          <select id="inputCourse" required>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Technology">Information Technology</option>
+            <option value="Electronics">Electronics</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="inputSemester">Semester</label>
+          <select id="inputSemester" required>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="inputTotal">Total Classes</label>
+          <input type="number" id="inputTotal" min="1" required value="40">
+        </div>
+        <div class="form-group">
+          <label for="inputAttended">Attended Classes</label>
+          <input type="number" id="inputAttended" min="0" required value="28">
+        </div>
+        <div class="form-group btn-align">
+          <button type="submit" class="btn btn-primary">+ Save Attendance</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- Filters & Export Bar -->
+    <section class="card controls-card">
+      <div class="controls-row">
+        <!-- Filters by Course / Semester -->
+        <div class="filter-box">
+          <label for="filterCourse">Course:</label>
+          <select id="filterCourse">
+            <option value="ALL">All Courses</option>
+            <option value="Computer Science">Computer Science</option>
+            <option value="Information Technology">Information Technology</option>
+            <option value="Electronics">Electronics</option>
+          </select>
+        </div>
+
+        <div class="filter-box">
+          <label for="filterSemester">Semester:</label>
+          <select id="filterSemester">
+            <option value="ALL">All Semesters</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+          </select>
+        </div>
+
+        <div class="filter-box">
+          <label for="filterRisk">Risk Indicator:</label>
+          <select id="filterRisk">
+            <option value="ALL">All Levels</option>
+            <option value="RISK">Needs Support (&lt; 75%)</option>
+            <option value="SAFE">Safe (&ge; 75%)</option>
+          </select>
+        </div>
+
+        <!-- Report Export -->
+        <div class="export-box">
+          <button type="button" id="btnExportReport" class="btn btn-outline">Export Report (CSV)</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Attendance Records Table -->
+    <section class="card table-card">
+      <div class="card-header">
+        <h3>Attendance Records & Risk Analysis</h3>
+        <span id="recordCount" class="text-muted">Loading records...</span>
+      </div>
+      <div class="table-responsive">
+        <table class="simple-table">
+          <thead>
+            <tr>
+              <th>Roll No</th>
+              <th>Student Name</th>
+              <th>Course</th>
+              <th>Semester</th>
+              <th>Total Classes</th>
+              <th>Attended</th>
+              <th>Attendance %</th>
+              <th>Risk Indicator</th>
+              <th>History</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <!-- Populated via JavaScript -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Alerts Section (Highlights students needing support) -->
+    <section id="alertsSection" class="card alerts-card">
+      <h3>Alerts & Academic Support Notifications</h3>
+      <p class="section-subtitle">Students below the 75% attendance threshold requiring academic intervention:</p>
+      <div id="alertsContainer" class="alerts-list">
+        <!-- Populated via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Student History Modal / Drawer -->
+    <div id="historyModal" class="modal" style="display: none;">
+      <div class="modal-box">
+        <div class="modal-header">
+          <h3 id="modalStudentName">Student History</h3>
+          <button type="button" id="btnCloseModal" class="close-btn">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p id="modalStudentDetails" class="modal-sub"></p>
+          <h4>Past Attendance Records:</h4>
+          <table class="simple-table">
+            <thead>
+              <tr>
+                <th>Date / Month</th>
+                <th>Subject</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="modalHistoryBody">
+              <!-- Populated via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <footer class="footer">
+    <p>Student Attendance Risk Predictor &bull; Basic HTML, CSS & JavaScript</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
