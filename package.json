@@ -1,15 +1,15 @@
 {
-  "name": "edualert",
+  "name": "sams",
   "version": "1.0.0",
-  "description": "EduAlert - Student Attendance & Academic Support System. A clean, minimal web application to track student attendance and highlight students needing early academic support.",
+  "description": "SAMS - Student Attendance Monitoring System. A clean, basic web application to analyze student attendance records and highlight students needing academic support.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "keywords": [
-    "edualert",
+    "sams",
     "attendance",
-    "academic-support",
+    "monitoring-system",
     "vanilla-js",
     "minimal-frontend"
   ],

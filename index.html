@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduAlert - Student Attendance & Academic Support</title>
+  <title>SAMS - Student Attendance Monitoring System</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -12,15 +12,14 @@
   <header class="navbar">
     <div class="nav-container">
       <div class="brand">
-        <div>
-          <h1>EduAlert</h1>
-          <p class="brand-sub">Student Attendance & Academic Support System</p>
-        </div>
+        <h1>SAMS</h1>
+        <p class="brand-sub">Student Attendance Monitoring System</p>
       </div>
-      <!-- Login / Role Selector -->
-      <div class="auth-box">
-        <label for="userRole">Logged in as:</label>
-        <select id="userRole" class="select-role">
+
+      <!-- Role Switcher: Teacher vs Student -->
+      <div class="role-box">
+        <label for="roleSelect">Login Role:</label>
+        <select id="roleSelect">
           <option value="admin">Teacher / Admin</option>
           <option value="student">Student Portal</option>
         </select>
@@ -28,88 +27,69 @@
     </div>
   </header>
 
-  <main class="main-content">
+  <main class="page-container">
 
-    <!-- About Section: Problem & Objective (Plain Language) -->
-    <section class="info-banner">
-      <div class="info-item">
-        <span class="info-tag tag-problem">The Problem</span>
+    <!-- Problem & Objective Banner -->
+    <section class="info-card">
+      <div class="info-block">
+        <span class="label-problem">The Problem:</span>
         <p>Colleges often identify students with poor attendance only after they have missed many classes, making timely intervention difficult.</p>
       </div>
       <div class="info-divider"></div>
-      <div class="info-item">
-        <span class="info-tag tag-objective">Our Objective</span>
-        <p>A web application that analyzes attendance records and highlights students who may need academic support early.</p>
+      <div class="info-block">
+        <span class="label-objective">The Objective:</span>
+        <p>Develop a web application that analyzes attendance records and highlights students who may need academic support.</p>
       </div>
     </section>
 
-    <!-- Student Self-Service View (Visible when Student Portal is selected) -->
-    <section id="studentPortalSection" class="student-portal-card" style="display: none;">
-      <div class="portal-header">
-        <div>
-          <h2>Student Attendance Portal</h2>
-          <p class="subtitle">Check your attendance percentage and eligibility status</p>
-        </div>
-        <div class="portal-select-wrap">
-          <label for="selectStudentAccount">Select Your Name:</label>
-          <select id="selectStudentAccount">
-            <!-- Populated by JavaScript -->
-          </select>
-        </div>
+    <!-- Student View (Visible only when Student Portal is selected) -->
+    <section id="studentPortal" class="card student-portal" style="display: none;">
+      <div class="student-select-row">
+        <label for="studentDropdown">Select Student:</label>
+        <select id="studentDropdown">
+          <!-- Populated by JavaScript -->
+        </select>
       </div>
-      <div id="studentPersonalCard" class="student-card-body">
-        <!-- Filled dynamically by JavaScript -->
+      <div id="studentPersonalDetails" class="student-info-box">
+        <!-- Filled by JavaScript -->
       </div>
     </section>
 
-    <!-- Dashboard: Key Summary Cards (FR: Dashboard) -->
+    <!-- Dashboard Summary Cards -->
     <section id="dashboardSection" class="dashboard-grid">
-      <div class="stat-card">
-        <div class="stat-details">
-          <span class="stat-label">Total Students</span>
-          <p class="stat-number" id="dashTotalStudents">0</p>
-        </div>
+      <div class="stat-box">
+        <span class="stat-title">Total Students</span>
+        <p class="stat-value" id="totalStudentsCount">0</p>
       </div>
-
-      <div class="stat-card">
-        <div class="stat-details">
-          <span class="stat-label">Average Attendance</span>
-          <p class="stat-number" id="dashAvgAttendance">0%</p>
-        </div>
+      <div class="stat-box">
+        <span class="stat-title">Average Attendance</span>
+        <p class="stat-value" id="averageAttendancePercent">0%</p>
       </div>
-
-      <div class="stat-card stat-card-alert">
-        <div class="stat-details">
-          <span class="stat-label">Students Needing Support</span>
-          <p class="stat-number" id="dashAtRisk">0</p>
-        </div>
+      <div class="stat-box stat-alert">
+        <span class="stat-title">Students Needing Support</span>
+        <p class="stat-value text-red" id="atRiskStudentsCount">0</p>
       </div>
     </section>
 
-    <!-- Attendance Entry & Import (FR: Attendance Entry / Import) -->
+    <!-- Attendance Entry Form & Sample Data Reset -->
     <section id="entrySection" class="card">
-      <div class="card-top">
-        <div>
-          <h2>Add or Update Attendance</h2>
-          <p class="subtitle">Enter attendance details for a student or reload sample records</p>
-        </div>
-        <button type="button" id="btnImportData" class="btn btn-secondary">
-          Reset Sample Data
-        </button>
+      <div class="card-header">
+        <h2>Record Attendance</h2>
+        <button type="button" id="btnResetData" class="btn btn-secondary">Reset Sample Data</button>
       </div>
 
-      <form id="attendanceForm" class="form-grid">
-        <div class="input-group">
+      <form id="attendanceEntryForm" class="form-grid">
+        <div class="form-item">
           <label for="inputRoll">Roll Number</label>
           <input type="text" id="inputRoll" required placeholder="e.g. CS-101">
         </div>
 
-        <div class="input-group">
+        <div class="form-item">
           <label for="inputName">Student Name</label>
           <input type="text" id="inputName" required placeholder="e.g. Rahul Sharma">
         </div>
 
-        <div class="input-group">
+        <div class="form-item">
           <label for="inputCourse">Course</label>
           <select id="inputCourse" required>
             <option value="Computer Science">Computer Science</option>
@@ -118,7 +98,7 @@
           </select>
         </div>
 
-        <div class="input-group">
+        <div class="form-item">
           <label for="inputSemester">Semester</label>
           <select id="inputSemester" required>
             <option value="1">Semester 1</option>
@@ -130,28 +110,28 @@
           </select>
         </div>
 
-        <div class="input-group">
+        <div class="form-item">
           <label for="inputTotal">Total Classes</label>
           <input type="number" id="inputTotal" min="1" required value="40">
         </div>
 
-        <div class="input-group">
+        <div class="form-item">
           <label for="inputAttended">Classes Attended</label>
           <input type="number" id="inputAttended" min="0" required value="28">
         </div>
 
-        <div class="input-group btn-group-end">
+        <div class="form-item btn-align-bottom">
           <button type="submit" class="btn btn-primary">+ Save Record</button>
         </div>
       </form>
     </section>
 
-    <!-- Filters & Actions Bar (FR: Filters by Course/Semester, Report Export) -->
-    <section class="filter-bar">
-      <div class="filter-controls">
+    <!-- Filters & Export Toolbar -->
+    <section class="toolbar-card">
+      <div class="filters-row">
         <div class="filter-item">
-          <label for="filterCourse">Filter by Course:</label>
-          <select id="filterCourse">
+          <label for="courseFilter">Course:</label>
+          <select id="courseFilter">
             <option value="ALL">All Courses</option>
             <option value="Computer Science">Computer Science</option>
             <option value="Information Technology">Information Technology</option>
@@ -160,8 +140,8 @@
         </div>
 
         <div class="filter-item">
-          <label for="filterSemester">Filter by Semester:</label>
-          <select id="filterSemester">
+          <label for="semesterFilter">Semester:</label>
+          <select id="semesterFilter">
             <option value="ALL">All Semesters</option>
             <option value="1">Semester 1</option>
             <option value="2">Semester 2</option>
@@ -173,40 +153,38 @@
         </div>
 
         <div class="filter-item">
-          <label for="filterRisk">Filter by Risk:</label>
-          <select id="filterRisk">
+          <label for="riskFilter">Risk Status:</label>
+          <select id="riskFilter">
             <option value="ALL">All Students</option>
             <option value="RISK">Needs Support (&lt; 75%)</option>
-            <option value="SAFE">Safe (75% or above)</option>
+            <option value="SAFE">Safe (&ge; 75%)</option>
           </select>
         </div>
       </div>
 
-      <div class="filter-actions">
-        <button type="button" id="btnExportReport" class="btn btn-outline">
-          Export Report (CSV)
-        </button>
+      <div class="export-row">
+        <button type="button" id="btnExportCSV" class="btn btn-outline">Export Report (CSV)</button>
       </div>
     </section>
 
-    <!-- Attendance Records Table (FR: Percentage Calculation, Risk Indicators) -->
-    <section class="card table-card">
-      <div class="card-top">
+    <!-- Attendance Table -->
+    <section class="card">
+      <div class="card-header">
         <div>
-          <h2>Attendance Records & Risk Analysis</h2>
-          <p class="subtitle" id="recordCount">Loading records...</p>
+          <h2>Attendance Records</h2>
+          <p class="subtitle" id="tableRecordCount">Showing 0 students</p>
         </div>
-        <div class="table-legend">
-          <span class="legend-badge badge-safe">Safe (&ge; 75%)</span>
-          <span class="legend-badge badge-danger">Needs Support (&lt; 75%)</span>
+        <div class="legend-row">
+          <span class="badge badge-safe">Safe (&ge; 75%)</span>
+          <span class="badge badge-danger">Needs Support (&lt; 75%)</span>
         </div>
       </div>
 
-      <div class="table-responsive">
-        <table class="data-table">
+      <div class="table-container">
+        <table class="attendance-table">
           <thead>
             <tr>
-              <th>Roll No</th>
+              <th>Roll Number</th>
               <th>Student Name</th>
               <th>Course</th>
               <th>Semester</th>
@@ -214,55 +192,50 @@
               <th class="text-center">Attended</th>
               <th class="text-center">Attendance %</th>
               <th>Risk Indicator</th>
-              <th class="text-center">Action</th>
+              <th class="text-center">History</th>
             </tr>
           </thead>
-          <tbody id="tableBody">
-            <!-- Populated dynamically by JavaScript -->
+          <tbody id="attendanceTableBody">
+            <!-- Populated by JavaScript -->
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- Alerts: Highlighting Students Who Need Academic Support (FR: Alerts) -->
-    <section id="alertsSection" class="card alerts-section">
-      <div class="card-top">
-        <div>
-          <h2>Academic Support Alerts</h2>
-          <p class="subtitle">Students falling below the 75% college attendance threshold:</p>
-        </div>
+    <!-- Alerts Section -->
+    <section id="alertsSection" class="card alerts-box">
+      <div class="card-header">
+        <h2>Academic Support Alerts</h2>
+        <p class="subtitle">Students falling below the mandatory 75% attendance threshold:</p>
       </div>
       <div id="alertsContainer" class="alerts-list">
-        <!-- Populated dynamically by JavaScript -->
+        <!-- Populated by JavaScript -->
       </div>
     </section>
 
-    <!-- Student History Modal (FR: Student History) -->
-    <div id="historyModal" class="modal-backdrop" style="display: none;">
-      <div class="modal-window">
-        <div class="modal-header">
-          <div>
-            <h3 id="modalStudentName">Student Attendance History</h3>
-            <p id="modalStudentDetails" class="modal-sub"></p>
-          </div>
-          <button type="button" id="btnCloseModal" class="modal-close" aria-label="Close">&times;</button>
+    <!-- Student History Modal Popup -->
+    <div id="historyModal" class="modal-overlay" style="display: none;">
+      <div class="modal-box">
+        <div class="modal-top">
+          <h3 id="modalStudentName">Student History</h3>
+          <button type="button" id="btnCloseModalX" class="close-btn">&times;</button>
         </div>
-        <div class="modal-content">
-          <h4>Past Class Records:</h4>
-          <table class="data-table modal-table">
+        <div class="modal-body">
+          <p id="modalStudentSummary" class="modal-subtitle"></p>
+          <table class="attendance-table">
             <thead>
               <tr>
-                <th>Time Period</th>
+                <th>Period</th>
                 <th>Subject</th>
-                <th>Attendance Record</th>
+                <th>Record</th>
               </tr>
             </thead>
-            <tbody id="modalHistoryBody">
-              <!-- Populated dynamically by JavaScript -->
+            <tbody id="modalHistoryList">
+              <!-- Populated by JavaScript -->
             </tbody>
           </table>
         </div>
-        <div class="modal-footer">
+        <div class="modal-bottom">
           <button type="button" id="btnCloseModalBtn" class="btn btn-secondary">Close</button>
         </div>
       </div>
@@ -270,11 +243,10 @@
 
   </main>
 
-  <footer class="app-footer">
-    <div class="footer-container">
-      <p><strong>EduAlert</strong> &mdash; Student Attendance & Academic Support System</p>
-      <p class="footer-note">Built using clean and basic HTML, CSS, and JavaScript.</p>
-    </div>
+  <!-- Page Footer -->
+  <footer class="page-footer">
+    <p><strong>SAMS</strong> &mdash; Student Attendance Monitoring System</p>
+    <p class="footer-sub">Simple, clean web application using basic HTML, CSS, and JavaScript.</p>
   </footer>
 
   <script src="app.js"></script>

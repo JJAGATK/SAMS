@@ -1,7 +1,7 @@
 services:
   # Web Service (Node.js) on Render
   - type: web
-    name: edualert
+    name: sams-attendance-system
     runtime: node
     plan: free
     buildCommand: ""
