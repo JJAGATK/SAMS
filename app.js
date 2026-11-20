@@ -2,17 +2,32 @@
  * SAMS - Student Attendance Monitoring System
  * Simple, Clean Vanilla JavaScript
  * 
- * Written in plain, beginner-friendly JavaScript so anyone can easily read 
- * and explain it in viva / project presentations.
+ * Features:
+ * - Proper Login Page for Teachers and Students
+ * - Role-based Views: Students only see their own attendance details
+ * - Dynamic Attendance Percentage & Risk Calculation
+ * - Academic Support Alerts (< 75%)
+ * - Filters by Course & Semester
+ * - Export Report to CSV
  */
 
 // ==========================================================================
-// 1. DATA: List of sample students
+// 1. DATA: Teacher Account & Sample Student Records
 // ==========================================================================
+
+// Teacher / Admin credentials
+const teacherAccount = {
+  username: "admin",
+  password: "admin123",
+  displayName: "Faculty / Admin"
+};
+
+// Initial list of students
 const initialStudents = [
   {
     rollNo: "CS-101",
     name: "Aarav Patel",
+    password: "1234",
     course: "Computer Science",
     semester: "5",
     totalClasses: 40,
@@ -25,6 +40,7 @@ const initialStudents = [
   {
     rollNo: "CS-102",
     name: "Rohan Verma",
+    password: "1234",
     course: "Computer Science",
     semester: "5",
     totalClasses: 40,
@@ -37,6 +53,7 @@ const initialStudents = [
   {
     rollNo: "IT-201",
     name: "Sneha Mukherjee",
+    password: "1234",
     course: "Information Technology",
     semester: "3",
     totalClasses: 50,
@@ -49,6 +66,7 @@ const initialStudents = [
   {
     rollNo: "IT-202",
     name: "Vikram Malhotra",
+    password: "1234",
     course: "Information Technology",
     semester: "3",
     totalClasses: 50,
@@ -61,6 +79,7 @@ const initialStudents = [
   {
     rollNo: "EC-301",
     name: "Ananya Iyer",
+    password: "1234",
     course: "Electronics",
     semester: "5",
     totalClasses: 45,
@@ -75,8 +94,11 @@ const initialStudents = [
 // Active copy of data in memory
 let students = JSON.parse(JSON.stringify(initialStudents));
 
+// Stores the currently logged in user { role: 'teacher' | 'student', studentData?: student }
+let currentUser = null;
+
 // ==========================================================================
-// 2. MATH HELPERS: Percentage and Risk Status
+// 2. MATH HELPERS: Percentage & Risk Status
 // ==========================================================================
 
 // Calculates: (Attended / Total) * 100
@@ -86,7 +108,7 @@ function getPercentage(attended, total) {
   return percent.toFixed(1); // e.g. "62.5"
 }
 
-// Checks if student is in Safe Zone (>= 75%) or Needs Academic Support (< 75%)
+// College 75% rule
 function getRiskStatus(percentage) {
   let num = parseFloat(percentage);
   if (num < 75.0) {
@@ -104,8 +126,191 @@ function getRiskStatus(percentage) {
   }
 }
 
+// Calculates how many future classes student must attend without missing any to reach 75%
+function getClassesNeededFor75(attended, total) {
+  let required = Math.ceil((0.75 * total - attended) / 0.25);
+  return Math.max(0, required);
+}
+
 // ==========================================================================
-// 3. DASHBOARD: Calculate summary statistics
+// 3. AUTHENTICATION & LOGIN SCREEN
+// ==========================================================================
+
+// Tab switching between Teacher and Student login
+const tabTeacher = document.getElementById("tabTeacher");
+const tabStudent = document.getElementById("tabStudent");
+const formTeacherLogin = document.getElementById("formTeacherLogin");
+const formStudentLogin = document.getElementById("formStudentLogin");
+
+tabTeacher.addEventListener("click", function() {
+  tabTeacher.classList.add("active");
+  tabStudent.classList.remove("active");
+  formTeacherLogin.style.display = "flex";
+  formStudentLogin.style.display = "none";
+});
+
+tabStudent.addEventListener("click", function() {
+  tabStudent.classList.add("active");
+  tabTeacher.classList.remove("active");
+  formStudentLogin.style.display = "flex";
+  formTeacherLogin.style.display = "none";
+});
+
+// Teacher Login Form Submit
+formTeacherLogin.addEventListener("submit", function(e) {
+  e.preventDefault();
+  let user = document.getElementById("teacherUsername").value.trim();
+  let pass = document.getElementById("teacherPassword").value.trim();
+
+  if (user === teacherAccount.username && pass === teacherAccount.password) {
+    currentUser = {
+      role: "teacher",
+      displayName: teacherAccount.displayName
+    };
+    renderApp();
+  } else {
+    alert("Invalid Teacher credentials. Use admin / admin123");
+  }
+});
+
+// Student Login Form Submit
+formStudentLogin.addEventListener("submit", function(e) {
+  e.preventDefault();
+  let roll = document.getElementById("studentRoll").value.trim().toUpperCase();
+  let pass = document.getElementById("studentPassword").value.trim();
+
+  // Find the student by roll number
+  let foundStudent = null;
+  for (let i = 0; i < students.length; i++) {
+    if (students[i].rollNo.toUpperCase() === roll) {
+      foundStudent = students[i];
+      break;
+    }
+  }
+
+  if (foundStudent && pass === foundStudent.password) {
+    currentUser = {
+      role: "student",
+      studentData: foundStudent
+    };
+    renderApp();
+  } else {
+    alert("Invalid Student Roll Number or Password. Example: CS-101 / 1234");
+  }
+});
+
+// Logout Button
+document.getElementById("btnLogout").addEventListener("click", function() {
+  currentUser = null;
+  renderApp();
+});
+
+// Controls what screen is displayed based on currentUser
+function renderApp() {
+  const loginScreen = document.getElementById("loginScreen");
+  const mainAppContent = document.getElementById("mainAppContent");
+  const navUserBox = document.getElementById("navUserBox");
+  const navUserName = document.getElementById("navUserName");
+
+  const teacherView = document.getElementById("teacherDashboardView");
+  const studentView = document.getElementById("studentPersonalView");
+
+  // CASE 1: Logged Out
+  if (!currentUser) {
+    loginScreen.style.display = "flex";
+    mainAppContent.style.display = "none";
+    navUserBox.style.display = "none";
+    return;
+  }
+
+  // CASE 2: Logged In
+  loginScreen.style.display = "none";
+  mainAppContent.style.display = "block";
+  navUserBox.style.display = "flex";
+
+  if (currentUser.role === "teacher") {
+    // Show Teacher View; Hide Student View
+    navUserName.textContent = "Teacher: Admin";
+    teacherView.style.display = "block";
+    studentView.style.display = "none";
+
+    // Refresh Teacher tables & metrics
+    updateDashboard();
+    renderTable();
+    updateAlerts();
+  } else if (currentUser.role === "student") {
+    // Show Student View ONLY; Hide Teacher View completely
+    navUserName.textContent = "Student: " + currentUser.studentData.name;
+    teacherView.style.display = "none";
+    studentView.style.display = "block";
+
+    // Populate the student's personal details
+    renderStudentPersonalDashboard(currentUser.studentData);
+  }
+}
+
+// ==========================================================================
+// 4. STUDENT PERSONAL VIEW (Only sees their own attendance!)
+// ==========================================================================
+function renderStudentPersonalDashboard(student) {
+  let pct = getPercentage(student.attendedClasses, student.totalClasses);
+  let missed = student.totalClasses - student.attendedClasses;
+  let risk = getRiskStatus(pct);
+
+  // Student Header
+  document.getElementById("stuGreetingName").textContent = `Welcome, ${student.name}`;
+  document.getElementById("stuMetaDetails").textContent = `${student.course} • Semester ${student.semester} • Roll No: ${student.rollNo}`;
+
+  // Badge
+  document.getElementById("stuRiskBadgeContainer").innerHTML = `
+    <span class="badge ${risk.badgeClass}" style="font-size: 13px; padding: 6px 12px;">${risk.label}</span>
+  `;
+
+  // Summary Metrics
+  document.getElementById("stuTotalHeld").textContent = student.totalClasses;
+  document.getElementById("stuTotalAttended").textContent = student.attendedClasses;
+  document.getElementById("stuTotalMissed").textContent = missed;
+  document.getElementById("stuPercentage").textContent = `${pct}%`;
+
+  // Notice Alert Banner
+  const noticeBanner = document.getElementById("stuNoticeBanner");
+  if (risk.isAtRisk) {
+    let needed = getClassesNeededFor75(student.attendedClasses, student.totalClasses);
+    noticeBanner.className = "student-notice-card notice-danger";
+    noticeBanner.innerHTML = `
+      <strong>Academic Support Notice:</strong> Your attendance is currently <strong>${pct}%</strong>, which is below the mandatory 75% college requirement.
+      <br>To get back into the safe zone, you must attend the next <strong>${needed} consecutive classes</strong> without being absent. Please meet your faculty advisor for guidance.
+    `;
+  } else {
+    noticeBanner.className = "student-notice-card notice-safe";
+    noticeBanner.innerHTML = `
+      <strong>Good Standing:</strong> Your attendance is <strong>${pct}%</strong> and meets the college examination eligibility requirement. Keep it up!
+    `;
+  }
+
+  // Student's own subject history table
+  const subjectTbody = document.getElementById("stuSubjectTableBody");
+  subjectTbody.innerHTML = "";
+
+  let logs = student.history || [];
+  if (logs.length === 0) {
+    subjectTbody.innerHTML = `<tr><td colspan="3" style="text-align:center; padding:12px; color:#64748b;">No subject history recorded yet.</td></tr>`;
+    return;
+  }
+
+  for (let i = 0; i < logs.length; i++) {
+    let tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${logs[i].period}</td>
+      <td><strong>${logs[i].subject}</strong></td>
+      <td>${logs[i].record}</td>
+    `;
+    subjectTbody.appendChild(tr);
+  }
+}
+
+// ==========================================================================
+// 5. TEACHER DASHBOARD: Summary Statistics
 // ==========================================================================
 function updateDashboard() {
   let totalStudents = students.length;
@@ -124,14 +329,13 @@ function updateDashboard() {
 
   let average = totalStudents > 0 ? (sumPercentage / totalStudents).toFixed(1) : "0.0";
 
-  // Update numbers on the screen
   document.getElementById("totalStudentsCount").textContent = totalStudents;
   document.getElementById("averageAttendancePercent").textContent = average + "%";
   document.getElementById("atRiskStudentsCount").textContent = atRiskCount;
 }
 
 // ==========================================================================
-// 4. TABLE: Render student attendance rows with filters
+// 6. TEACHER TABLE: Render All Student Rows with Filters
 // ==========================================================================
 function renderTable() {
   const tableBody = document.getElementById("attendanceTableBody");
@@ -139,7 +343,7 @@ function renderTable() {
   const selectedSemester = document.getElementById("semesterFilter").value;
   const selectedRisk = document.getElementById("riskFilter").value;
 
-  // Filter students array based on dropdown choices
+  // Filter students based on dropdowns
   const filtered = students.filter(function(s) {
     let pct = parseFloat(getPercentage(s.attendedClasses, s.totalClasses));
     let isRisk = pct < 75.0;
@@ -153,10 +357,7 @@ function renderTable() {
     return matchCourse && matchSemester && matchRisk;
   });
 
-  // Update record count text
   document.getElementById("tableRecordCount").textContent = `Showing ${filtered.length} of ${students.length} students`;
-
-  // Clear existing table rows
   tableBody.innerHTML = "";
 
   if (filtered.length === 0) {
@@ -164,7 +365,6 @@ function renderTable() {
     return;
   }
 
-  // Add each student as a table row
   for (let i = 0; i < filtered.length; i++) {
     let s = filtered[i];
     let pct = getPercentage(s.attendedClasses, s.totalClasses);
@@ -191,19 +391,17 @@ function renderTable() {
 }
 
 // ==========================================================================
-// 5. ALERTS: Show students who have low attendance (< 75%)
+// 7. TEACHER ALERTS: Highlighting Students Below 75%
 // ==========================================================================
 function updateAlerts() {
   const container = document.getElementById("alertsContainer");
   container.innerHTML = "";
 
   let count = 0;
-
   for (let i = 0; i < students.length; i++) {
     let s = students[i];
     let pct = parseFloat(getPercentage(s.attendedClasses, s.totalClasses));
 
-    // Only show students whose attendance is below 75%
     if (pct < 75.0) {
       count++;
       let alertItem = document.createElement("div");
@@ -226,10 +424,9 @@ function updateAlerts() {
 }
 
 // ==========================================================================
-// 6. HISTORY POPUP: Show student's past attendance
+// 8. STUDENT HISTORY MODAL (For Teacher View)
 // ==========================================================================
 function openStudentHistory(rollNo) {
-  // Find the student by roll number
   let student = null;
   for (let i = 0; i < students.length; i++) {
     if (students[i].rollNo === rollNo) {
@@ -261,11 +458,9 @@ function openStudentHistory(rollNo) {
     historyList.appendChild(row);
   }
 
-  // Show the modal
   document.getElementById("historyModal").style.display = "flex";
 }
 
-// Close popup
 function closeHistoryModal() {
   document.getElementById("historyModal").style.display = "none";
 }
@@ -274,7 +469,7 @@ document.getElementById("btnCloseModalX").addEventListener("click", closeHistory
 document.getElementById("btnCloseModalBtn").addEventListener("click", closeHistoryModal);
 
 // ==========================================================================
-// 7. FORM: Add or update attendance
+// 9. FORM: Add or Update Student Record
 // ==========================================================================
 document.getElementById("attendanceEntryForm").addEventListener("submit", function(event) {
   event.preventDefault();
@@ -286,13 +481,11 @@ document.getElementById("attendanceEntryForm").addEventListener("submit", functi
   let total = parseInt(document.getElementById("inputTotal").value);
   let attended = parseInt(document.getElementById("inputAttended").value);
 
-  // Simple validation
   if (attended > total) {
     alert("Attended classes cannot be more than total classes.");
     return;
   }
 
-  // Check if roll number already exists
   let existingIndex = -1;
   for (let i = 0; i < students.length; i++) {
     if (students[i].rollNo === roll) {
@@ -302,17 +495,16 @@ document.getElementById("attendanceEntryForm").addEventListener("submit", functi
   }
 
   if (existingIndex >= 0) {
-    // Update existing student
     students[existingIndex].name = name;
     students[existingIndex].course = course;
     students[existingIndex].semester = semester;
     students[existingIndex].totalClasses = total;
     students[existingIndex].attendedClasses = attended;
   } else {
-    // Add new student
     students.push({
       rollNo: roll,
       name: name,
+      password: "1234",
       course: course,
       semester: semester,
       totalClasses: total,
@@ -323,11 +515,9 @@ document.getElementById("attendanceEntryForm").addEventListener("submit", functi
     });
   }
 
-  // Refresh UI
   updateDashboard();
   renderTable();
   updateAlerts();
-  populateStudentDropdown();
 
   alert(`Attendance saved for ${name} (${roll})`);
   event.target.reset();
@@ -339,88 +529,11 @@ document.getElementById("btnResetData").addEventListener("click", function() {
   updateDashboard();
   renderTable();
   updateAlerts();
-  populateStudentDropdown();
   alert("Sample data has been reset.");
 });
 
 // ==========================================================================
-// 8. ROLE SWITCHING: Admin vs Student Portal
-// ==========================================================================
-function setupRoles() {
-  const roleSelect = document.getElementById("roleSelect");
-  const studentPortal = document.getElementById("studentPortal");
-  const dashboardSection = document.getElementById("dashboardSection");
-  const entrySection = document.getElementById("entrySection");
-  const alertsSection = document.getElementById("alertsSection");
-
-  roleSelect.addEventListener("change", function(e) {
-    let role = e.target.value;
-
-    if (role === "student") {
-      // Student view: show personal portal card, hide admin forms
-      studentPortal.style.display = "block";
-      dashboardSection.style.display = "none";
-      entrySection.style.display = "none";
-      alertsSection.style.display = "none";
-      showStudentPersonalCard();
-    } else {
-      // Admin view: show full dashboard and controls
-      studentPortal.style.display = "none";
-      dashboardSection.style.display = "grid";
-      entrySection.style.display = "block";
-      alertsSection.style.display = "block";
-    }
-  });
-
-  document.getElementById("studentDropdown").addEventListener("change", showStudentPersonalCard);
-}
-
-// Fill student dropdown
-function populateStudentDropdown() {
-  const dropdown = document.getElementById("studentDropdown");
-  dropdown.innerHTML = "";
-
-  for (let i = 0; i < students.length; i++) {
-    let opt = document.createElement("option");
-    opt.value = students[i].rollNo;
-    opt.textContent = `${students[i].name} (${students[i].rollNo})`;
-    dropdown.appendChild(opt);
-  }
-}
-
-// Display personal student details in the student portal
-function showStudentPersonalCard() {
-  let selectedRoll = document.getElementById("studentDropdown").value || (students[0] && students[0].rollNo);
-  let student = null;
-
-  for (let i = 0; i < students.length; i++) {
-    if (students[i].rollNo === selectedRoll) {
-      student = students[i];
-      break;
-    }
-  }
-
-  if (!student) return;
-
-  let pct = getPercentage(student.attendedClasses, student.totalClasses);
-  let risk = getRiskStatus(pct);
-
-  const container = document.getElementById("studentPersonalDetails");
-  container.innerHTML = `
-    <h3>${student.name} (${student.rollNo})</h3>
-    <p>Course: <strong>${student.course}</strong> &bull; Semester: <strong>${student.semester}</strong></p>
-    <p>Classes Conducted: <strong>${student.totalClasses}</strong> | Attended: <strong>${student.attendedClasses}</strong></p>
-    <p>Your Attendance: <strong>${pct}%</strong> &mdash; Status: <span class="badge ${risk.badgeClass}">${risk.label}</span></p>
-    <div class="student-note ${risk.isAtRisk ? 'note-danger' : 'note-safe'}">
-      ${risk.isAtRisk 
-        ? "Warning: Your attendance is below 75%. Please contact your faculty for academic support."
-        : "Good: Your attendance is above the 75% requirement."}
-    </div>
-  `;
-}
-
-// ==========================================================================
-// 9. EXPORT: Download CSV Report
+// 10. EXPORT: Download CSV Report (Teacher only)
 // ==========================================================================
 function exportCSV() {
   let csv = "Roll No,Student Name,Course,Semester,Total Classes,Attended Classes,Attendance %,Status\n";
@@ -444,18 +557,14 @@ function exportCSV() {
 
 document.getElementById("btnExportCSV").addEventListener("click", exportCSV);
 
-// Listen to filter dropdown changes
+// Filter Event Listeners
 document.getElementById("courseFilter").addEventListener("change", renderTable);
 document.getElementById("semesterFilter").addEventListener("change", renderTable);
 document.getElementById("riskFilter").addEventListener("change", renderTable);
 
 // ==========================================================================
-// 10. INITIALIZATION: Run when page loads
+// 11. INITIALIZATION: On Page Load, show Login Screen
 // ==========================================================================
 window.addEventListener("DOMContentLoaded", function() {
-  populateStudentDropdown();
-  updateDashboard();
-  renderTable();
-  updateAlerts();
-  setupRoles();
+  renderApp(); // starts with currentUser = null, displaying login screen
 });

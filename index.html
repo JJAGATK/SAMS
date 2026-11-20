@@ -16,204 +16,321 @@
         <p class="brand-sub">Student Attendance Monitoring System</p>
       </div>
 
-      <!-- Role Switcher: Teacher vs Student -->
-      <div class="role-box">
-        <label for="roleSelect">Login Role:</label>
-        <select id="roleSelect">
-          <option value="admin">Teacher / Admin</option>
-          <option value="student">Student Portal</option>
-        </select>
+      <!-- User Info & Logout Button (Shown when logged in) -->
+      <div id="navUserBox" class="user-box" style="display: none;">
+        <span id="navUserName" class="user-greeting">Welcome, User</span>
+        <button type="button" id="btnLogout" class="btn btn-sm btn-logout">Logout</button>
       </div>
     </div>
   </header>
 
   <main class="page-container">
 
-    <!-- Problem & Objective Banner -->
-    <section class="info-card">
-      <div class="info-block">
-        <span class="label-problem">The Problem:</span>
-        <p>Colleges often identify students with poor attendance only after they have missed many classes, making timely intervention difficult.</p>
-      </div>
-      <div class="info-divider"></div>
-      <div class="info-block">
-        <span class="label-objective">The Objective:</span>
-        <p>Develop a web application that analyzes attendance records and highlights students who may need academic support.</p>
-      </div>
-    </section>
-
-    <!-- Student View (Visible only when Student Portal is selected) -->
-    <section id="studentPortal" class="card student-portal" style="display: none;">
-      <div class="student-select-row">
-        <label for="studentDropdown">Select Student:</label>
-        <select id="studentDropdown">
-          <!-- Populated by JavaScript -->
-        </select>
-      </div>
-      <div id="studentPersonalDetails" class="student-info-box">
-        <!-- Filled by JavaScript -->
-      </div>
-    </section>
-
-    <!-- Dashboard Summary Cards -->
-    <section id="dashboardSection" class="dashboard-grid">
-      <div class="stat-box">
-        <span class="stat-title">Total Students</span>
-        <p class="stat-value" id="totalStudentsCount">0</p>
-      </div>
-      <div class="stat-box">
-        <span class="stat-title">Average Attendance</span>
-        <p class="stat-value" id="averageAttendancePercent">0%</p>
-      </div>
-      <div class="stat-box stat-alert">
-        <span class="stat-title">Students Needing Support</span>
-        <p class="stat-value text-red" id="atRiskStudentsCount">0</p>
-      </div>
-    </section>
-
-    <!-- Attendance Entry Form & Sample Data Reset -->
-    <section id="entrySection" class="card">
-      <div class="card-header">
-        <h2>Record Attendance</h2>
-        <button type="button" id="btnResetData" class="btn btn-secondary">Reset Sample Data</button>
-      </div>
-
-      <form id="attendanceEntryForm" class="form-grid">
-        <div class="form-item">
-          <label for="inputRoll">Roll Number</label>
-          <input type="text" id="inputRoll" required placeholder="e.g. CS-101">
+    <!-- ============================================================== -->
+    <!-- 1. LOGIN SCREEN (Visible when logged out)                      -->
+    <!-- ============================================================== -->
+    <section id="loginScreen" class="login-wrapper">
+      <div class="login-card">
+        <div class="login-header">
+          <h2>Portal Login</h2>
+          <p class="login-subtitle">Sign in to view attendance records and reports</p>
         </div>
 
-        <div class="form-item">
-          <label for="inputName">Student Name</label>
-          <input type="text" id="inputName" required placeholder="e.g. Rahul Sharma">
+        <!-- Role Toggle Tabs -->
+        <div class="login-tabs">
+          <button type="button" id="tabTeacher" class="tab-btn active">Teacher / Admin</button>
+          <button type="button" id="tabStudent" class="tab-btn">Student Portal</button>
         </div>
 
-        <div class="form-item">
-          <label for="inputCourse">Course</label>
-          <select id="inputCourse" required>
-            <option value="Computer Science">Computer Science</option>
-            <option value="Information Technology">Information Technology</option>
-            <option value="Electronics">Electronics</option>
-          </select>
-        </div>
+        <!-- Form A: Teacher Login -->
+        <form id="formTeacherLogin" class="login-form">
+          <div class="form-item">
+            <label for="teacherUsername">Teacher Username</label>
+            <input type="text" id="teacherUsername" required placeholder="Enter username (e.g. admin)">
+          </div>
+          <div class="form-item">
+            <label for="teacherPassword">Password</label>
+            <input type="password" id="teacherPassword" required placeholder="Enter password (e.g. admin123)">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In as Teacher</button>
+          <div class="demo-credentials">
+            <strong>Demo Login:</strong> Username: <code>admin</code> | Password: <code>admin123</code>
+          </div>
+        </form>
 
-        <div class="form-item">
-          <label for="inputSemester">Semester</label>
-          <select id="inputSemester" required>
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
-            <option value="3">Semester 3</option>
-            <option value="4">Semester 4</option>
-            <option value="5">Semester 5</option>
-            <option value="6">Semester 6</option>
-          </select>
-        </div>
+        <!-- Form B: Student Login -->
+        <form id="formStudentLogin" class="login-form" style="display: none;">
+          <div class="form-item">
+            <label for="studentRoll">Student Roll Number</label>
+            <input type="text" id="studentRoll" required placeholder="Enter your roll no (e.g. CS-101)">
+          </div>
+          <div class="form-item">
+            <label for="studentPassword">Password</label>
+            <input type="password" id="studentPassword" required placeholder="Enter password (e.g. 1234)">
+          </div>
+          <button type="submit" class="btn btn-primary btn-block">Sign In as Student</button>
+          <div class="demo-credentials">
+            <strong>Demo Students:</strong> Roll No: <code>CS-101</code> (or <code>CS-102</code>, <code>IT-201</code>) | Password: <code>1234</code>
+          </div>
+        </form>
 
-        <div class="form-item">
-          <label for="inputTotal">Total Classes</label>
-          <input type="number" id="inputTotal" min="1" required value="40">
-        </div>
-
-        <div class="form-item">
-          <label for="inputAttended">Classes Attended</label>
-          <input type="number" id="inputAttended" min="0" required value="28">
-        </div>
-
-        <div class="form-item">
-          <button type="submit" class="btn btn-primary">+ Save Record</button>
-        </div>
-      </form>
-    </section>
-
-    <!-- Filters & Export Toolbar -->
-    <section class="toolbar-card">
-      <div class="filters-row">
-        <div class="filter-item">
-          <label for="courseFilter">Course:</label>
-          <select id="courseFilter">
-            <option value="ALL">All Courses</option>
-            <option value="Computer Science">Computer Science</option>
-            <option value="Information Technology">Information Technology</option>
-            <option value="Electronics">Electronics</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="semesterFilter">Semester:</label>
-          <select id="semesterFilter">
-            <option value="ALL">All Semesters</option>
-            <option value="1">Semester 1</option>
-            <option value="2">Semester 2</option>
-            <option value="3">Semester 3</option>
-            <option value="4">Semester 4</option>
-            <option value="5">Semester 5</option>
-            <option value="6">Semester 6</option>
-          </select>
-        </div>
-
-        <div class="filter-item">
-          <label for="riskFilter">Risk Status:</label>
-          <select id="riskFilter">
-            <option value="ALL">All Students</option>
-            <option value="RISK">Needs Support (&lt; 75%)</option>
-            <option value="SAFE">Safe (&ge; 75%)</option>
-          </select>
-        </div>
-      </div>
-
-      <div>
-        <button type="button" id="btnExportCSV" class="btn btn-outline">Export Report (CSV)</button>
       </div>
     </section>
 
-    <!-- Attendance Table -->
-    <section class="card">
-      <div class="card-header">
-        <div>
-          <h2>Attendance Records</h2>
-          <p class="subtitle" id="tableRecordCount">Showing 0 students</p>
-        </div>
-        <div class="legend-row">
-          <span class="badge badge-safe">Safe (&ge; 75%)</span>
-          <span class="badge badge-danger">Needs Support (&lt; 75%)</span>
-        </div>
-      </div>
+    <!-- ============================================================== -->
+    <!-- 2. MAIN APPLICATION CONTENT (Visible only when logged in)      -->
+    <!-- ============================================================== -->
+    <div id="mainAppContent" style="display: none;">
 
-      <div class="table-container">
-        <table class="attendance-table">
-          <thead>
-            <tr>
-              <th>Roll Number</th>
-              <th>Student Name</th>
-              <th>Course</th>
-              <th>Semester</th>
-              <th class="text-center">Total Classes</th>
-              <th class="text-center">Attended</th>
-              <th class="text-center">Attendance %</th>
-              <th>Risk Indicator</th>
-              <th class="text-center">History</th>
-            </tr>
-          </thead>
-          <tbody id="attendanceTableBody">
+      <!-- ------------------------------------------------------------ -->
+      <!-- VIEW A: TEACHER / ADMIN DASHBOARD                            -->
+      <!-- ------------------------------------------------------------ -->
+      <div id="teacherDashboardView">
+        
+        <!-- Problem & Objective Banner -->
+        <section class="info-card">
+          <div class="info-block">
+            <span class="label-problem">The Problem:</span>
+            <p>Colleges often identify students with poor attendance only after they have missed many classes, making timely intervention difficult.</p>
+          </div>
+          <div class="info-divider"></div>
+          <div class="info-block">
+            <span class="label-objective">The Objective:</span>
+            <p>Develop a web application that analyzes attendance records and highlights students who may need academic support.</p>
+          </div>
+        </section>
+
+        <!-- Dashboard Summary Cards -->
+        <section class="dashboard-grid">
+          <div class="stat-box">
+            <span class="stat-title">Total Students</span>
+            <p class="stat-value" id="totalStudentsCount">0</p>
+          </div>
+          <div class="stat-box">
+            <span class="stat-title">Average Attendance</span>
+            <p class="stat-value" id="averageAttendancePercent">0%</p>
+          </div>
+          <div class="stat-box stat-alert">
+            <span class="stat-title">Students Needing Support</span>
+            <p class="stat-value text-red" id="atRiskStudentsCount">0</p>
+          </div>
+        </section>
+
+        <!-- Attendance Entry Form & Sample Data Reset -->
+        <section class="card">
+          <div class="card-header">
+            <h2>Record Attendance</h2>
+            <button type="button" id="btnResetData" class="btn btn-secondary">Reset Sample Data</button>
+          </div>
+
+          <form id="attendanceEntryForm" class="form-grid">
+            <div class="form-item">
+              <label for="inputRoll">Roll Number</label>
+              <input type="text" id="inputRoll" required placeholder="e.g. CS-101">
+            </div>
+
+            <div class="form-item">
+              <label for="inputName">Student Name</label>
+              <input type="text" id="inputName" required placeholder="e.g. Rahul Sharma">
+            </div>
+
+            <div class="form-item">
+              <label for="inputCourse">Course</label>
+              <select id="inputCourse" required>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics</option>
+              </select>
+            </div>
+
+            <div class="form-item">
+              <label for="inputSemester">Semester</label>
+              <select id="inputSemester" required>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+              </select>
+            </div>
+
+            <div class="form-item">
+              <label for="inputTotal">Total Classes</label>
+              <input type="number" id="inputTotal" min="1" required value="40">
+            </div>
+
+            <div class="form-item">
+              <label for="inputAttended">Classes Attended</label>
+              <input type="number" id="inputAttended" min="0" required value="28">
+            </div>
+
+            <div class="form-item">
+              <button type="submit" class="btn btn-primary">+ Save Record</button>
+            </div>
+          </form>
+        </section>
+
+        <!-- Filters & Export Toolbar -->
+        <section class="toolbar-card">
+          <div class="filters-row">
+            <div class="filter-item">
+              <label for="courseFilter">Course:</label>
+              <select id="courseFilter">
+                <option value="ALL">All Courses</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Electronics">Electronics</option>
+              </select>
+            </div>
+
+            <div class="filter-item">
+              <label for="semesterFilter">Semester:</label>
+              <select id="semesterFilter">
+                <option value="ALL">All Semesters</option>
+                <option value="1">Semester 1</option>
+                <option value="2">Semester 2</option>
+                <option value="3">Semester 3</option>
+                <option value="4">Semester 4</option>
+                <option value="5">Semester 5</option>
+                <option value="6">Semester 6</option>
+              </select>
+            </div>
+
+            <div class="filter-item">
+              <label for="riskFilter">Risk Status:</label>
+              <select id="riskFilter">
+                <option value="ALL">All Students</option>
+                <option value="RISK">Needs Support (&lt; 75%)</option>
+                <option value="SAFE">Safe (&ge; 75%)</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <button type="button" id="btnExportCSV" class="btn btn-outline">Export Report (CSV)</button>
+          </div>
+        </section>
+
+        <!-- Attendance Records Table -->
+        <section class="card">
+          <div class="card-header">
+            <div>
+              <h2>Attendance Records</h2>
+              <p class="subtitle" id="tableRecordCount">Showing 0 students</p>
+            </div>
+            <div class="legend-row">
+              <span class="badge badge-safe">Safe (&ge; 75%)</span>
+              <span class="badge badge-danger">Needs Support (&lt; 75%)</span>
+            </div>
+          </div>
+
+          <div class="table-container">
+            <table class="attendance-table">
+              <thead>
+                <tr>
+                  <th>Roll Number</th>
+                  <th>Student Name</th>
+                  <th>Course</th>
+                  <th>Semester</th>
+                  <th class="text-center">Total Classes</th>
+                  <th class="text-center">Attended</th>
+                  <th class="text-center">Attendance %</th>
+                  <th>Risk Indicator</th>
+                  <th class="text-center">History</th>
+                </tr>
+              </thead>
+              <tbody id="attendanceTableBody">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- Academic Support Alerts Section -->
+        <section class="card alerts-box">
+          <div class="card-header">
+            <h2>Academic Support Alerts</h2>
+            <p class="subtitle">Students falling below the mandatory 75% attendance threshold:</p>
+          </div>
+          <div id="alertsContainer" class="alerts-list">
             <!-- Populated by JavaScript -->
-          </tbody>
-        </table>
-      </div>
-    </section>
+          </div>
+        </section>
 
-    <!-- Alerts Section -->
-    <section id="alertsSection" class="card alerts-box">
-      <div class="card-header">
-        <h2>Academic Support Alerts</h2>
-        <p class="subtitle">Students falling below the mandatory 75% attendance threshold:</p>
       </div>
-      <div id="alertsContainer" class="alerts-list">
-        <!-- Populated by JavaScript -->
-      </div>
-    </section>
 
-    <!-- Student History Modal Popup -->
+      <!-- ------------------------------------------------------------ -->
+      <!-- VIEW B: STUDENT PERSONAL DASHBOARD (Only sees their own details) -->
+      <!-- ------------------------------------------------------------ -->
+      <div id="studentPersonalView" style="display: none;">
+        
+        <!-- Personal Welcome Banner -->
+        <section class="card student-banner">
+          <div class="student-header-flex">
+            <div>
+              <span class="badge-role">Student Portal</span>
+              <h2 id="stuGreetingName" class="stu-name">Welcome, Student</h2>
+              <p id="stuMetaDetails" class="stu-meta">Course &bull; Semester &bull; Roll Number</p>
+            </div>
+            <div id="stuRiskBadgeContainer">
+              <!-- Risk badge shown here -->
+            </div>
+          </div>
+        </section>
+
+        <!-- Student Attendance Stat Cards -->
+        <section class="dashboard-grid">
+          <div class="stat-box">
+            <span class="stat-title">Classes Conducted</span>
+            <p class="stat-value" id="stuTotalHeld">0</p>
+          </div>
+          <div class="stat-box">
+            <span class="stat-title">Classes Attended</span>
+            <p class="stat-value" id="stuTotalAttended">0</p>
+          </div>
+          <div class="stat-box">
+            <span class="stat-title">Classes Missed</span>
+            <p class="stat-value text-red" id="stuTotalMissed">0</p>
+          </div>
+          <div class="stat-box" id="stuPercentBox">
+            <span class="stat-title">My Attendance %</span>
+            <p class="stat-value" id="stuPercentage">0%</p>
+          </div>
+        </section>
+
+        <!-- Academic Support Notice Banner -->
+        <section id="stuNoticeBanner" class="student-notice-card">
+          <!-- Populated by JavaScript -->
+        </section>
+
+        <!-- Student's Own Subject Breakdown Table -->
+        <section class="card">
+          <div class="card-header">
+            <h2>My Subject-wise Attendance History</h2>
+            <p class="subtitle">Detailed breakdown of past subject sessions</p>
+          </div>
+          <div class="table-container">
+            <table class="attendance-table">
+              <thead>
+                <tr>
+                  <th>Period / Term</th>
+                  <th>Subject Course</th>
+                  <th>Class Record</th>
+                </tr>
+              </thead>
+              <tbody id="stuSubjectTableBody">
+                <!-- Populated by JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+      </div>
+
+    </div>
+
+    <!-- Student History Modal (For Teacher View) -->
     <div id="historyModal" class="modal-overlay" style="display: none;">
       <div class="modal-box">
         <div class="modal-top">

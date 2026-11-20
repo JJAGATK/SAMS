@@ -1,6 +1,6 @@
 # SAMS — Student Attendance Monitoring System
 
-A simple, clean web application designed to track student attendance and highlight students who may need academic support early before they miss too many classes.
+A clean, modern, and professional web application designed to track student attendance and highlight students who may need academic support early before they miss too many classes.
 
 ## The Problem
 Colleges often identify students with poor attendance only after they have missed many classes, making timely intervention difficult.
@@ -10,23 +10,32 @@ Develop a web application that analyzes attendance records and highlights studen
 
 ---
 
-## Core Features
-1. **Teacher Login & Student Portal:** Switch between full teacher controls and student personal attendance cards.
-2. **Attendance Entry & Import:** Form to record attendance for any student or reset sample records with one click.
-3. **Attendance Percentage Calculation:** Formula `(Classes Attended / Total Classes) * 100` dynamically calculated.
-4. **Risk Indicators:** Clear status badges marking students as **Safe** (&ge; 75%) or **Needs Support** (&lt; 75%).
-5. **Filters by Course & Semester:** Filter student records by branch (Computer Science, IT, Electronics) and semester.
-6. **Student History:** View past attendance records and breakdown for each student.
-7. **Academic Support Alerts:** Dedicated alert section highlighting students who have fallen below the 75% attendance threshold.
-8. **Dashboard Overview:** Summary cards displaying Total Students, Average Attendance %, and count of students needing support.
-9. **Report Export:** Download a complete attendance summary spreadsheet (`sams_attendance_report.csv`).
+## Authentication & Access Control
+
+### 1. Teacher / Admin Portal
+* Full access to class-wide analytics and tools.
+* **Username:** `admin`
+* **Password:** `admin123`
+* **Features:** Record and update attendance, view all students, filter by course and semester, review academic support alerts, reset sample data, and export CSV reports.
+
+### 2. Student Portal (Role-based Isolation)
+* Students **only see their own attendance records and personal metrics** (they cannot see other students' details, class tables, or administrative tools).
+* **Sample Student Credentials:**
+  - Roll No: `CS-101` (Aarav Patel) &bull; Password: `1234` *(At Risk: 62.5%)*
+  - Roll No: `CS-102` (Rohan Verma) &bull; Password: `1234` *(Safe: 90.0%)*
+  - Roll No: `IT-201` (Sneha Mukherjee) &bull; Password: `1234` *(At Risk: 68.0%)*
+* **Student Features:**
+  - Personal attendance overview: Total conducted, attended, missed, and calculated attendance percentage.
+  - Eligibility & Risk Badge (`Safe` vs `Needs Support`).
+  - Tailored guidance note (including exact consecutive classes needed to reach 75% if in the warning zone).
+  - Subject-by-subject attendance breakdown for their enrolled courses.
 
 ---
 
 ## Tech Stack
 - **HTML5:** Semantic, clean structure.
-- **CSS3:** Modern, clean, responsive design without any external CSS frameworks.
-- **Vanilla JavaScript:** Clean, readable functions with zero dependencies.
+- **CSS3:** Modern system typography (`-apple-system`, `Segoe UI`, `Roboto`), responsive card layout, zero frameworks.
+- **Vanilla JavaScript:** Clean, readable, beginner-friendly functions with zero dependencies.
 - **Node.js:** Lightweight built-in server for local hosting and Render deployment.
 
 ---
