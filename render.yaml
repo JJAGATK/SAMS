@@ -1,7 +1,7 @@
 services:
-  # Option 1: Web Service (Node.js)
+  # Web Service (Node.js) on Render
   - type: web
-    name: student-attendance-risk-predictor
+    name: attendtrack
     runtime: node
     plan: free
     buildCommand: ""

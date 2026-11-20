@@ -1,16 +1,17 @@
 {
-  "name": "student-attendance-risk-predictor",
+  "name": "attendtrack",
   "version": "1.0.0",
-  "description": "Minimal web application that analyzes attendance records and highlights students who may need academic support.",
+  "description": "AttendTrack - Student Attendance & Academic Support System. A clean, minimal web application to track student attendance and highlight students needing early academic support.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "keywords": [
+    "attendtrack",
     "attendance",
-    "risk-predictor",
-    "minimal-frontend",
-    "vanilla-js"
+    "academic-support",
+    "vanilla-js",
+    "minimal-frontend"
   ],
   "author": "JJAGATK",
   "license": "MIT"
