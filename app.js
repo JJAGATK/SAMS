@@ -566,5 +566,31 @@ document.getElementById("riskFilter").addEventListener("change", renderTable);
 // 11. INITIALIZATION: On Page Load, show Login Screen
 // ==========================================================================
 window.addEventListener("DOMContentLoaded", function() {
-  renderApp(); // starts with currentUser = null, displaying login screen
+  const params = new URLSearchParams(window.location.search);
+  const view = params.get("view");
+  if (view === "teacher") {
+    currentUser = { role: "teacher", displayName: "Faculty / Admin" };
+    renderApp();
+  } else if (view === "teacher-table") {
+    currentUser = { role: "teacher", displayName: "Faculty / Admin" };
+    renderApp();
+    setTimeout(() => {
+      document.querySelector(".attendance-table").scrollIntoView({ behavior: "instant", block: "center" });
+    }, 100);
+  } else if (view === "alerts") {
+    currentUser = { role: "teacher", displayName: "Faculty / Admin" };
+    renderApp();
+    setTimeout(() => {
+      document.querySelector(".alerts-box").scrollIntoView({ behavior: "instant", block: "center" });
+    }, 100);
+  } else if (view === "student") {
+    currentUser = { role: "student", studentData: students[0] };
+    renderApp();
+  } else if (view === "history") {
+    currentUser = { role: "teacher", displayName: "Faculty / Admin" };
+    renderApp();
+    openStudentHistory("CS-101");
+  } else {
+    renderApp(); // starts with currentUser = null, displaying login screen
+  }
 });
