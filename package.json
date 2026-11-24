@@ -1,17 +1,15 @@
 {
   "name": "sams",
   "version": "1.0.0",
-  "description": "SAMS - Student Attendance Monitoring System. A clean, basic web application to analyze student attendance records and highlight students needing academic support.",
+  "description": "Student Attendance Monitoring System",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "keywords": [
-    "sams",
     "attendance",
     "monitoring-system",
-    "vanilla-js",
-    "minimal-frontend"
+    "vanilla-js"
   ],
   "author": "JJAGATK",
   "license": "MIT"
