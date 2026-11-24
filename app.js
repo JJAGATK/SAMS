@@ -26,31 +26,37 @@ const getRiskStatus = (pct) => {
 };
 const getClassesNeededFor75 = (a, t) => Math.max(0, Math.ceil((0.75 * t - a) / 0.25));
 
-const setTab = (isT) => {
-  $("tabTeacher").classList.toggle("active", isT);
-  $("tabStudent").classList.toggle("active", !isT);
-  $("formTeacherLogin").style.display = isT ? "flex" : "none";
-  $("formStudentLogin").style.display = isT ? "none" : "flex";
-};
-$("tabTeacher").onclick = () => setTab(true);
-$("tabStudent").onclick = () => setTab(false);
-
-$("formTeacherLogin").onsubmit = (e) => {
+$("formLogin").onsubmit = (e) => {
   e.preventDefault();
-  if ($("teacherUsername").value.trim() === teacherAccount.username && $("teacherPassword").value.trim() === teacherAccount.password) {
-    currentUser = { role: "teacher", displayName: teacherAccount.displayName };
-    renderApp();
-  } else alert("Invalid Teacher credentials. Use admin / admin123");
-};
+  const idInput = $("loginIdentifier").value.trim();
+  const pwdInput = $("loginPassword").value.trim();
 
-$("formStudentLogin").onsubmit = (e) => {
-  e.preventDefault();
-  const roll = $("studentRoll").value.trim().toUpperCase();
-  const found = students.find((s) => s.rollNo.toUpperCase() === roll);
-  if (found && $("studentPassword").value.trim() === found.password) {
-    currentUser = { role: "student", studentData: found };
-    renderApp();
-  } else alert("Invalid Student Roll Number or Password. Example: CS-101 / 1234");
+  // If Admin / Teacher username entered
+  if (idInput.toLowerCase() === teacherAccount.username.toLowerCase()) {
+    if (pwdInput === teacherAccount.password) {
+      currentUser = { role: "teacher", displayName: teacherAccount.displayName };
+      renderApp();
+      return;
+    } else {
+      alert("Invalid password for Admin. Default is: admin123");
+      return;
+    }
+  }
+
+  // Otherwise check if Student Roll Number entered
+  const student = students.find((s) => s.rollNo.toUpperCase() === idInput.toUpperCase());
+  if (student) {
+    if (pwdInput === student.password) {
+      currentUser = { role: "student", studentData: student };
+      renderApp();
+      return;
+    } else {
+      alert(`Invalid password for student ${student.rollNo}. Default is: 1234`);
+      return;
+    }
+  }
+
+  alert("Account not found. For Teacher/Admin login use 'admin' (password: admin123). For Student login use roll number like 'CS-101' (password: 1234).");
 };
 
 $("btnLogout").onclick = () => { currentUser = null; renderApp(); };
