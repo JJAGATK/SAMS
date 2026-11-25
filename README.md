@@ -40,26 +40,6 @@ Develop a web application that analyzes attendance records and highlights studen
 
 ---
 
-## Running Locally
-
-1. Start the server:
-   ```bash
-   node server.js
-   ```
-2. Open your web browser and go to:
-   ```
-   http://localhost:3000
-   ```
-
----
-
-## Deploying to Render (Free)
-
-1. Go to [Render Dashboard](https://dashboard.render.com/) and click **New +** > **Web Service**.
-2. Connect your GitHub repository: `JJAGATK/student-attendance-risk-predictor`.
-3. Set the following:
-   - **Name:** `sams-attendance`
-   - **Runtime:** `Node`
    - **Start Command:** `node server.js`
    - **Plan:** `Free`
 4. Click **Deploy Web Service**.
